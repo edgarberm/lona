@@ -73,7 +73,10 @@ export class Canvas {
 
     for (const layer of this.layers) {
       const inside = isInsideRect(layer.rect, coords.x, coords.y)
-      console.log(inside)
+      if (inside) {
+        console.log(layer)
+        break
+      }
     }
   }
 }

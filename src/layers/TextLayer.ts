@@ -1,6 +1,6 @@
 import Layer from './Layer'
 
-export default class Text extends Layer {
+export default class TextLayer extends Layer {
   private _text: string = ''
   private _fontFamily: string = 'Helvetica'
   private _fontSize: number = 14
