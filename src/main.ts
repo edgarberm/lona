@@ -1,45 +1,72 @@
 import { Canvas } from './engine/Canvas'
 import ImageLayer from './engine/layers/ImageLayer'
 import TextLayer from './engine/layers/TextLayer'
+import VideoLayer from './engine/layers/VideoLayer'
 import './style.css'
 
 const parent = document.querySelector('#app')!
-// Init canvas
-const canvas = new Canvas(1024, 768, parent, 'white')
 
-// Create a text layers
-const text = new TextLayer(canvas.context, 'Agachupagüer 💀')
-text.x = 600
-text.y = 100
-text.fontSize = 24
-text.fontWeight = 600
-text.color = '#9c00ff'
+// function init() {
+  // Init canvas
+  const canvas = new Canvas(1024, 768, parent, 'white')
 
-canvas.addLayer(text)
+  // Create video layer
+  const video = new VideoLayer(
+    canvas.context,
+    'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4'
+  )
+  video.x = 360
+  video.y = 390
 
-const text2 = new TextLayer(canvas.context, 'Hello Canva')
-text2.x = 550
-text2.y = 320
-text2.fontSize = 24
-text2.fontWeight = 600
-text2.rotation = -45
+  canvas.addLayer(video)
 
-canvas.addLayer(text2)
+  // Create a text layers
+  const text = new TextLayer(canvas.context, 'Agachupagüer 💀')
+  text.x = 600
+  text.y = 100
+  text.fontSize = 24
+  text.fontWeight = 600
+  text.color = '#9c00ff'
 
-const image = new ImageLayer(
-  canvas.context,
-  'https://images.pexels.com/photos/14998052/pexels-photo-14998052/free-photo-of-photo-of-a-camera-body-on-yellow-background.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500'
-)
-image.x = 0
-image.y = 0
-image.rotation = 45
+  canvas.addLayer(text)
 
-canvas.addLayer(image)
+  const text2 = new TextLayer(canvas.context, 'Hello Canva')
+  text2.x = 550
+  text2.y = 320
+  text2.fontSize = 24
+  text2.fontWeight = 600
+  text2.rotation = -45
 
-// Render the canvas
-canvas.render()
+  canvas.addLayer(text2)
 
-// function render() {
-//   canvas.render(() => { text.draw() })
+  // Create image layer
+  const image = new ImageLayer(
+    canvas.context,
+    'https://images.pexels.com/photos/14998052/pexels-photo-14998052/free-photo-of-photo-of-a-camera-body-on-yellow-background.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500'
+  )
+  image.x = 0
+  image.y = 0
+  image.rotation = 45
+
+  canvas.addLayer(image)
+
+  // Render the canvas
+  canvas.render()
+
+  // function render() {
+  //   text.rotation += 2
+
+  //   canvas.render()
+  //   window.requestAnimationFrame(render)
+  // }
+
+  // window.requestAnimationFrame(render)
 // }
-// render()
+
+// const button = document.createElement('button')
+// button.innerText = 'INIT'
+// parent.appendChild(button)
+
+// button.addEventListener('click', () => {
+//   init()
+// })

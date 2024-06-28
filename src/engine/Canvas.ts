@@ -67,8 +67,9 @@ export class Canvas {
   }
 
   onMouseDown(event: MouseEvent): void {
+    
     const coords = getClientCoordinates(event, this.viewport)
-
+    
     this.layers.forEach((l) => (l.active = false))
 
     for (const layer of this.layers) {
