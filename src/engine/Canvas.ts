@@ -1,6 +1,6 @@
-import Layer from '../layers/Layer'
-import getClientCoordinates from '../utils/getClientCoordinates'
-import isClickInsideLayer from '../utils/isClickInsideLayer'
+import Layer from './layers/Layer'
+import getClientCoordinates from './utils/getClientCoordinates'
+import isClickInsideLayer from './utils/isClickInsideLayer'
 
 export class Canvas {
   public viewport: HTMLCanvasElement

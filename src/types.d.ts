@@ -1,4 +1,4 @@
-type LayerType = 'image' | 'video' | 'audio' | 'text'
+type LayerType = 'image' | 'video' | 'audio' | 'text' | 'transform'
 
 type Point = {
   x: number

@@ -1,21 +1,30 @@
 import { Canvas } from './engine/Canvas'
-import ImageLayer from './layers/ImageLayer'
-import TextLayer from './layers/TextLayer'
+import ImageLayer from './engine/layers/ImageLayer'
+import TextLayer from './engine/layers/TextLayer'
 import './style.css'
 
 const parent = document.querySelector('#app')!
 // Init canvas
 const canvas = new Canvas(1024, 768, parent, 'white')
 
-// Create a text layer
-const text = new TextLayer(canvas.context, 'Hello Canva ⚡️')
+// Create a text layers
+const text = new TextLayer(canvas.context, 'Agachupagüer 💀')
 text.x = 600
 text.y = 100
 text.fontSize = 24
 text.fontWeight = 600
-text.rotation = 45
+text.color = '#9c00ff'
 
 canvas.addLayer(text)
+
+const text2 = new TextLayer(canvas.context, 'Hello Canva')
+text2.x = 550
+text2.y = 320
+text2.fontSize = 24
+text2.fontWeight = 600
+text2.rotation = -45
+
+canvas.addLayer(text2)
 
 const image = new ImageLayer(
   canvas.context,
