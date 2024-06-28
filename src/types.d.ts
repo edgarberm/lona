@@ -1,3 +1,5 @@
+type LayerType = 'image' | 'video' | 'audio' | 'text'
+
 type Point = {
   x: number
   y: number

@@ -11,20 +11,24 @@ export default class TextLayer extends Layer {
     super(context)
 
     this.text = text ?? ''
-    this.setRect()
   }
 
   public draw(): void {
-    const y = this.y + this.fontSize
-    
     this.context.save()
-
+    
     this.context.fillStyle = this.color
     this.context.font = `${this.fontWeight} ${this.fontSize}px ${this.fontFamily}`
-    this.context.translate(this.x, y)
+    
+    this.width = this.context.measureText(this.text).width
+    this.height = this.fontSize
+    
+    const centerX = this.x + this.width / 2
+    const centerY = this.y + this.fontSize / 2
+
+    this.context.translate(centerX, centerY)
     this.context.rotate((this.rotation * Math.PI) / 180.0)
-    this.context.translate(-this.x, -y)
-    this.context.fillText(this.text, this.x, y)
+    this.context.translate(-centerX, -centerY)
+    this.context.fillText(this.text, this.x, this.y + this.fontSize)
 
     this.context.restore()
   }
@@ -35,7 +39,6 @@ export default class TextLayer extends Layer {
 
   set text(text: string) {
     this._text = text
-    this.setRect()
   }
 
   get fontFamily(): string {
@@ -44,7 +47,6 @@ export default class TextLayer extends Layer {
 
   set fontFamily(family: string) {
     this._fontFamily = family
-    this.setRect()
   }
 
   get fontSize(): number {
@@ -53,7 +55,6 @@ export default class TextLayer extends Layer {
 
   set fontSize(size: number) {
     this._fontSize = size
-    this.setRect()
   }
 
   get fontWeight(): number {
@@ -62,7 +63,6 @@ export default class TextLayer extends Layer {
 
   set fontWeight(weight: number) {
     this._fontWeight = weight
-    this.setRect()
   }
 
   get color(): string {
@@ -71,17 +71,5 @@ export default class TextLayer extends Layer {
 
   set color(color: string) {
     this._color = color
-  }
-
-  private setRect(): void {
-    this.context.font = `${this.fontWeight} ${this.fontSize}px ${this.fontFamily}`
-
-    const metrics = this.context.measureText(this.text)
-    const width = metrics.width
-    const actualBoundingBoxAscent = metrics.actualBoundingBoxAscent || 0
-    const actualBoundingBoxDescent = metrics.actualBoundingBoxDescent || 0
-    const height = actualBoundingBoxAscent + actualBoundingBoxDescent
-
-    this.rect = new DOMRect(this.x, this.y, width, height)
   }
 }

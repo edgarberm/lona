@@ -4,9 +4,10 @@ export default abstract class Layer {
   private _id: string = uuidv4()
   private _x: number = 0
   private _y: number = 0
+  private _width: number = 0
+  private _height: number = 0
   private _active: boolean = false
   private _rotation: number = 0
-  private _rect: DOMRect = new DOMRect()
 
   constructor(protected context: CanvasRenderingContext2D) {}
 
@@ -34,6 +35,22 @@ export default abstract class Layer {
     this._y = y
   }
 
+  get width() {
+    return this._width
+  }
+
+  set width(width: number) {
+    this._width = width
+  }
+
+  get height() {
+    return this._height
+  }
+
+  set height(height: number) {
+    this._height = height
+  }
+
   get active(): boolean {
     return this._active
   }
@@ -48,14 +65,6 @@ export default abstract class Layer {
 
   set rotation(rotation: number) {
     this._rotation = rotation
-  }
-
-  get rect(): DOMRect {
-    return this._rect
-  }
-
-  set rect(rect: DOMRect) {
-    this._rect = rect
   }
 
   public abstract draw(): void

@@ -1,6 +1,6 @@
 import Layer from '../layers/Layer'
 import getClientCoordinates from '../utils/getClientCoordinates'
-import isInsideRect from '../utils/isInsideRect'
+import isClickInsideLayer from '../utils/isClickInsideLayer'
 
 export class Canvas {
   public viewport: HTMLCanvasElement
@@ -72,7 +72,8 @@ export class Canvas {
     this.layers.forEach((l) => (l.active = false))
 
     for (const layer of this.layers) {
-      const inside = isInsideRect(layer.rect, coords.x, coords.y)
+      const inside = isClickInsideLayer(coords.x, coords.y, layer)
+
       if (inside) {
         console.log(layer)
         break
