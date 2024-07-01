@@ -87,7 +87,8 @@ export class Canvas {
     this.transformLayer.layer = null
     this.transformLayer.draw()
 
-    for (const layer of this.layers) {
+    for (let i = this.layers.length - 1; i >= 0; i--) {
+      const layer = this.layers[i]
       const inside = isClickInsideLayer(coords.x, coords.y, layer)
 
       if (inside) {
