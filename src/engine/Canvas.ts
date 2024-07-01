@@ -90,27 +90,27 @@ export class Canvas {
     document.addEventListener('mouseup', this.onMouseUp.bind(this))
 
     const coords = getClientCoordinates(event, this.viewport)
+    const transformLayer = this.transformLayer
 
-    const handleIndex = this.transformLayer.checkHandleHit(coords.x, coords.y)
+    const handleIndex = transformLayer.checkHandleHit(coords.x, coords.y)
     if (handleIndex !== null && handleIndex !== -1) {
-      this.transformLayer.startDraggingHandle(handleIndex)
+      transformLayer.startDraggingHandle(handleIndex)
       return
     }
 
     if (
-      this.transformLayer.layer &&
-      !this.isCursorOverLayer(coords.x, coords.y) &&
-      this.transformLayer.isNearRotateHandle(coords.x, coords.y)
+      transformLayer.layer &&
+      transformLayer.isNearHandle(coords.x, coords.y)
     ) {
-      this.transformLayer.startRotating(coords.x, coords.y)
+      transformLayer.startRotating(coords.x, coords.y)
       return
     }
 
     this.layers.forEach((l) => (l.active = false))
 
     this.interactiveLayer = null
-    this.transformLayer.layer = null
-    this.transformLayer.draw()
+    transformLayer.layer = null
+    transformLayer.draw()
 
     for (let i = this.layers.length - 1; i >= 0; i--) {
       const layer = this.layers[i]
@@ -118,12 +118,12 @@ export class Canvas {
 
       if (inside) {
         this.interactiveLayer = layer
-        this.transformLayer.layer = layer
+        transformLayer.layer = layer
 
         this.offsetX = coords.x - layer.x
         this.offsetY = coords.y - layer.y
 
-        this.transformLayer.draw()
+        transformLayer.draw()
         break
       }
     }
@@ -131,23 +131,24 @@ export class Canvas {
 
   private onMouseMove(event: MouseEvent): void {
     const coords = getClientCoordinates(event, this.viewport)
-    const handleIndex = this.transformLayer.checkHandleHit(coords.x, coords.y)
-    const isText = this.transformLayer.layer instanceof TextLayer
+    const transformLayer = this.transformLayer
+    const handleIndex =transformLayer.checkHandleHit(coords.x, coords.y)
+    const isText = transformLayer.layer instanceof TextLayer
 
-    if (this.transformLayer.draggingHandleIndex !== null && !isText) {
-      this.transformLayer.dragHandle(coords.x, coords.y)
+    if (transformLayer.handleIndex !== null && !isText) {
+      transformLayer.dragHandle(coords.x, coords.y)
       this.render()
       return
     }
 
-    if (this.transformLayer.rotating) {
-      this.transformLayer.rotate(coords.x, coords.y)
+    if (transformLayer.rotating) {
+      transformLayer.rotate(coords.x, coords.y)
       this.render()
       return
     }
 
     if (handleIndex !== null && handleIndex !== -1 && !isText) {
-      const layerRotation = this.transformLayer.layer!.rotation
+      const layerRotation = transformLayer.layer!.rotation
 
       if (handleIndex === 0 || handleIndex === 2) {
         document.body.style.cursor = setResizeCursor(-45 + layerRotation)
@@ -160,20 +161,18 @@ export class Canvas {
       return
     }
 
-    if (
-      this.transformLayer.layer &&
-      !this.isCursorOverLayer(coords.x, coords.y)
-    ) {
-      const isNearRotateHandle = this.transformLayer.isNearRotateHandle(
+    if (transformLayer.layer) {
+      const isNearRotateHandle = transformLayer.isNearHandle(
         coords.x,
         coords.y
       )
       if (isNearRotateHandle) {
+        console.log('llega');
         document.body.style.cursor = setRotateCursor()
         return
       }
     }
-
+    
     for (let i = this.layers.length - 1; i >= 0; i--) {
       const layer = this.layers[i]
       const inside = clickInsideLayer(coords.x, coords.y, layer)
@@ -198,14 +197,5 @@ export class Canvas {
     this.transformLayer.stopDraggingHandle()
     this.transformLayer.stopRotating()
     this.interactiveLayer = null
-  }
-
-  private isCursorOverLayer(x: number, y: number): boolean {
-    for (const layer of this.layers) {
-      if (clickInsideLayer(x, y, layer)) {
-        return true
-      }
-    }
-    return false
   }
 }

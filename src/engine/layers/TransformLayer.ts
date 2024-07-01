@@ -1,11 +1,13 @@
 import applyInverseRotation from '../utils/applyInverseRotation'
 import Layer from './Layer'
 
+const size = 8
+
 export default class TransformLayer extends Layer {
   private _layer: Layer | null = null
   private handles: Point[] = []
-  public draggingHandleIndex: number | null = null
-  private initialLayerState: Partial<Layer> | null = null
+  public handleIndex: number | null = null
+  private initialLayer: Partial<Layer> | null = null
   public rotating: boolean = false
   private initialAngle: number = 0
   private initialMouseAngle: number = 0
@@ -14,13 +16,20 @@ export default class TransformLayer extends Layer {
     super(context)
   }
 
+  get layer(): Layer | null {
+    return this._layer
+  }
+
+  set layer(layer: Layer | null) {
+    this._layer = layer
+  }
+
   public draw(): void {
     if (!this.layer) return
 
     const { x, y, width, height, rotation } = this.layer
     const cx = x + width / 2
     const cy = y + height / 2
-    const size = 8
 
     this.updateHandles()
 
@@ -54,14 +63,6 @@ export default class TransformLayer extends Layer {
     this.context.restore()
   }
 
-  get layer(): Layer | null {
-    return this._layer
-  }
-
-  set layer(layer: Layer | null) {
-    this._layer = layer
-  }
-
   private updateHandles(): void {
     if (!this.layer) return
 
@@ -80,10 +81,8 @@ export default class TransformLayer extends Layer {
     const { x: layerX, y: layerY, width, height, rotation } = this.layer
     const cx = layerX + width / 2
     const cy = layerY + height / 2
-
     const rotatedPoint = applyInverseRotation(x, y, cx, cy, rotation)
 
-    const size = 8
     return this.handles.findIndex(
       (handle) =>
         rotatedPoint.x >= handle.x - size / 2 &&
@@ -94,10 +93,10 @@ export default class TransformLayer extends Layer {
   }
 
   public startDraggingHandle(index: number): void {
-    this.draggingHandleIndex = index
+    this.handleIndex = index
 
     if (this.layer) {
-      this.initialLayerState = {
+      this.initialLayer = {
         width: this.layer.width,
         height: this.layer.height,
         x: this.layer.x,
@@ -107,15 +106,15 @@ export default class TransformLayer extends Layer {
   }
 
   public stopDraggingHandle(): void {
-    this.draggingHandleIndex = null
-    this.initialLayerState = null
+    this.handleIndex = null
+    this.initialLayer = null
   }
 
   public dragHandle(x: number, y: number): void {
     if (
-      this.draggingHandleIndex === null ||
+      this.handleIndex === null ||
       !this.layer ||
-      !this.initialLayerState
+      !this.initialLayer
     )
       return
 
@@ -124,9 +123,9 @@ export default class TransformLayer extends Layer {
       height,
       x: initialX,
       y: initialY,
-    } = this.initialLayerState as Layer
+    } = this.initialLayer as Layer
     const { handles } = this
-    const oppositeHandle = handles[(this.draggingHandleIndex + 2) % 4]
+    const oppositeHandle = handles[(this.handleIndex + 2) % 4]
     const rotatedPoint = applyInverseRotation(
       x,
       y,
@@ -151,19 +150,19 @@ export default class TransformLayer extends Layer {
     const deltaX = this.layer.width - width
     const deltaY = this.layer.height - height
 
-    if (this.draggingHandleIndex === 0) {
+    if (this.handleIndex === 0) {
       this.layer.x = initialX - deltaX
       this.layer.y = initialY - deltaY
-    } else if (this.draggingHandleIndex === 1) {
+    } else if (this.handleIndex === 1) {
       this.layer.y = initialY - deltaY
-    } else if (this.draggingHandleIndex === 3) {
+    } else if (this.handleIndex === 3) {
       this.layer.x = initialX - deltaX
     }
 
     this.updateHandles()
   }
 
-  public isNearRotateHandle(x: number, y: number): boolean {
+  public isNearHandle(x: number, y: number): boolean {
     if (!this.layer) return false
 
     const { x: layerX, y: layerY, width, height, rotation } = this.layer
@@ -191,7 +190,6 @@ export default class TransformLayer extends Layer {
   }
 
   private isCursorOnHandle(x: number, y: number): boolean {
-    const size = 8
     return this.handles.some(
       (handle) =>
         x >= handle.x - size / 2 &&
@@ -208,6 +206,7 @@ export default class TransformLayer extends Layer {
       const { x: layerX, y: layerY, width, height } = this.layer
       const cx = layerX + width / 2
       const cy = layerY + height / 2
+
       this.initialAngle = this.layer.rotation
       this.initialMouseAngle = Math.atan2(y - cy, x - cx)
     }
@@ -228,6 +227,7 @@ export default class TransformLayer extends Layer {
 
     this.layer.rotation =
       (this.initialAngle + (angleDelta * 180) / Math.PI) % 360
+
     this.updateHandles()
   }
 }
