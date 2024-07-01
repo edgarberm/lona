@@ -1,3 +1,6 @@
+/** 
+ * @deprecated
+ **/
 export default function isInsideRect(
   rect: DOMRect,
   x: number,

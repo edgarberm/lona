@@ -131,7 +131,7 @@ export class Canvas {
     }
 
     if (handleIndex !== null && handleIndex !== -1 && !isText) {
-      const layerRotation = this.transformLayer.layer!.rotation // Asumiendo que tienes acceso a la rotación de la capa
+      const layerRotation = this.transformLayer.layer!.rotation
 
       if (handleIndex === 0 || handleIndex === 2) {
         document.body.style.cursor = setResizeCursor(-45 + layerRotation)

@@ -1,4 +1,6 @@
-/** @deprecated */
+/** 
+ * @deprecated
+ **/
 export default function rotatePoint(
   cx: number,
   cy: number,

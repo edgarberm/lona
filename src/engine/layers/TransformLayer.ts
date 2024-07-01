@@ -78,7 +78,6 @@ export default class TransformLayer extends Layer {
     const cx = layerX + width / 2
     const cy = layerY + height / 2
 
-    // Rotar el punto del ratón de vuelta para la detección precisa del handle
     const rotatedPoint = applyInverseRotation(x, y, cx, cy, rotation)
 
     const size = 8
@@ -150,32 +149,14 @@ export default class TransformLayer extends Layer {
     const deltaY = this.layer.height - height
 
     if (this.draggingHandleIndex === 0) {
-      // top-left
       this.layer.x = initialX - deltaX
       this.layer.y = initialY - deltaY
     } else if (this.draggingHandleIndex === 1) {
-      // top-right
       this.layer.y = initialY - deltaY
     } else if (this.draggingHandleIndex === 3) {
-      // bottom-left
       this.layer.x = initialX - deltaX
     }
 
     this.updateHandles()
   }
-
-  // public applyInverseRotation(
-  //   x: number,
-  //   y: number,
-  //   cx: number,
-  //   cy: number,
-  //   angle: number
-  // ): Point {
-  //   const radians = (angle * Math.PI) / 180
-  //   const cos = Math.cos(radians)
-  //   const sin = Math.sin(radians)
-  //   const nx = cos * (x - cx) + sin * (y - cy) + cx
-  //   const ny = cos * (y - cy) - sin * (x - cx) + cy
-  //   return { x: nx, y: ny }
-  // }
 }
