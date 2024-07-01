@@ -3,6 +3,7 @@ import Layer from './Layer'
 export default class VideoLayer extends Layer {
   private _url: string = ''
   private _video?: HTMLVideoElement = undefined
+  private _currentTime: number = 0.01
 
   constructor(protected context: CanvasRenderingContext2D, url: string) {
     super(context)
@@ -12,6 +13,8 @@ export default class VideoLayer extends Layer {
 
   public draw(): void {
     if (!this._video) return
+    
+    this._video.currentTime = this._currentTime
 
     this.context.save()
 
@@ -36,12 +39,20 @@ export default class VideoLayer extends Layer {
     this.load(url)
   }
 
+  get time() {
+    return this._currentTime
+  }
+
+  set time(time: number) {
+    this._currentTime = time
+  }
+
   private load(url: string) {
     const video = document.createElement('video')
     video.setAttribute('crossorigin', 'anonymous')
     video.setAttribute('preload', 'metadata')
     video.src = url
-    video.currentTime = 0.001
+    video.currentTime = this._currentTime
     video.load()
     
     video.addEventListener('loadedmetadata', () => {
