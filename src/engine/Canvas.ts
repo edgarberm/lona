@@ -16,6 +16,9 @@ export class Canvas {
   private _height: number
   private _fill: string
   private transformLayer: TransformLayer
+  private interactiveLayer: Layer | null = null
+  private offsetX: number = 0 
+  private offsetY: number = 0 
 
   constructor(
     width: number,
@@ -27,7 +30,7 @@ export class Canvas {
     this._height = height
     this._fill = fill
 
-    const parent = element ?? document.body
+    const container = element ?? document.body
     this.dpr = window.devicePixelRatio ?? 1
 
     this.viewport = document.createElement('canvas')
@@ -37,7 +40,7 @@ export class Canvas {
     this.viewport.style.width = `${width}px`
     this.viewport.style.height = `${height}px`
 
-    parent.appendChild(this.viewport)
+    container.appendChild(this.viewport)
 
     this.context = this.viewport.getContext('2d')!
     this.context.scale(this.dpr, this.dpr)
@@ -45,6 +48,7 @@ export class Canvas {
     this.transformLayer = new TransformLayer(this.context)
 
     this.viewport.addEventListener('mousedown', this.onMouseDown.bind(this))
+    this.viewport.addEventListener('mousemove', this.onMouseMove.bind(this))
   }
 
   public render(callback?: (context: CanvasRenderingContext2D) => void): void {
@@ -79,24 +83,47 @@ export class Canvas {
     }
   }
 
-  onMouseDown(event: MouseEvent): void {
+  private onMouseDown(event: MouseEvent): void {
+    document.addEventListener('mouseup', this.onMouseUp.bind(this))
+
     const coords = getClientCoordinates(event, this.viewport)
 
     this.layers.forEach((l) => (l.active = false))
-
+    
+    this.interactiveLayer = null
     this.transformLayer.layer = null
     this.transformLayer.draw()
-
+    
     for (let i = this.layers.length - 1; i >= 0; i--) {
       const layer = this.layers[i]
       const inside = isClickInsideLayer(coords.x, coords.y, layer)
-
+      
       if (inside) {
-        // console.log(layer)
+        this.interactiveLayer = layer
         this.transformLayer.layer = layer
+        
+        this.offsetX = coords.x - layer.x
+        this.offsetY = coords.y - layer.y
+
         this.transformLayer.draw()
         break
       }
     }
+  }
+
+  private onMouseMove(event: MouseEvent): void {
+    const coords = getClientCoordinates(event, this.viewport)
+
+    if (this.interactiveLayer) {
+      this.interactiveLayer.x = coords.x - this.offsetX
+      this.interactiveLayer.y = coords.y - this.offsetY
+      return
+    }
+  }
+
+  private onMouseUp(): void {
+    document.removeEventListener('mouseup', this.onMouseUp)
+
+    this.interactiveLayer = null
   }
 }

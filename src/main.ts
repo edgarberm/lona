@@ -8,7 +8,7 @@ const parent = document.querySelector('#app')!
 
 // function init() {
   // Init canvas
-  const canvas = new Canvas(1024, 768, parent, '#fff') // 202124
+  const canvas = new Canvas(1245, 700, parent, '#fff') // 202124
 
   // Create video layer
   const video = new VideoLayer(
@@ -17,7 +17,7 @@ const parent = document.querySelector('#app')!
   )
   video.x = 360
   video.y = 390
-  video.rotation = 30
+  video.rotation = 45
   video.index = 0
 
   canvas.addLayer(video)
