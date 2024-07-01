@@ -1,8 +1,11 @@
+import applyInverseRotation from '../utils/applyInverseRotation'
 import Layer from './Layer'
 
 export default class TransformLayer extends Layer {
   private _layer: Layer | null = null
   private handles: Point[] = []
+  public draggingHandleIndex: number | null = null
+  private initialLayerState: Partial<Layer> | null = null
 
   constructor(protected context: CanvasRenderingContext2D) {
     super(context)
@@ -27,12 +30,22 @@ export default class TransformLayer extends Layer {
     this.context.strokeStyle = '#1380e4'
     this.context.lineWidth = 1
     this.context.fillStyle = 'white'
-    
+
     this.context.strokeRect(x, y, width, height)
-    
+
     this.handles.forEach((handle) => {
-      this.context.fillRect(handle.x - (size / 2), handle.y - (size / 2), size, size)
-      this.context.strokeRect(handle.x - (size / 2), handle.y - (size / 2), size, size)
+      this.context.fillRect(
+        handle.x - size / 2,
+        handle.y - size / 2,
+        size,
+        size
+      )
+      this.context.strokeRect(
+        handle.x - size / 2,
+        handle.y - size / 2,
+        size,
+        size
+      )
     })
 
     this.context.restore()
@@ -57,4 +70,112 @@ export default class TransformLayer extends Layer {
       { x: x, y: y + height },
     ]
   }
+
+  public checkHandleHit(x: number, y: number): number | null {
+    if (!this.layer) return null
+
+    const { x: layerX, y: layerY, width, height, rotation } = this.layer
+    const cx = layerX + width / 2
+    const cy = layerY + height / 2
+
+    // Rotar el punto del ratón de vuelta para la detección precisa del handle
+    const rotatedPoint = applyInverseRotation(x, y, cx, cy, rotation)
+
+    const size = 8
+    return this.handles.findIndex(
+      (handle) =>
+        rotatedPoint.x >= handle.x - size / 2 &&
+        rotatedPoint.x <= handle.x + size / 2 &&
+        rotatedPoint.y >= handle.y - size / 2 &&
+        rotatedPoint.y <= handle.y + size / 2
+    )
+  }
+
+  public startDraggingHandle(index: number): void {
+    this.draggingHandleIndex = index
+
+    if (this.layer) {
+      this.initialLayerState = {
+        width: this.layer.width,
+        height: this.layer.height,
+        x: this.layer.x,
+        y: this.layer.y,
+      }
+    }
+  }
+
+  public stopDraggingHandle(): void {
+    this.draggingHandleIndex = null
+    this.initialLayerState = null
+  }
+
+  public dragHandle(x: number, y: number): void {
+    if (
+      this.draggingHandleIndex === null ||
+      !this.layer ||
+      !this.initialLayerState
+    )
+      return
+
+    const {
+      width,
+      height,
+      x: initialX,
+      y: initialY,
+    } = this.initialLayerState as Layer
+    const { handles } = this
+    const oppositeHandle = handles[(this.draggingHandleIndex + 2) % 4]
+    const rotatedPoint = applyInverseRotation(
+      x,
+      y,
+      initialX + width / 2,
+      initialY + height / 2,
+      this.layer.rotation
+    )
+
+    const dx = rotatedPoint.x - oppositeHandle.x
+    const dy = rotatedPoint.y - oppositeHandle.y
+
+    const newWidth = Math.abs(dx)
+    const newHeight = Math.abs(dy)
+
+    const scaleX = newWidth / width
+    const scaleY = newHeight / height
+    const scale = Math.min(scaleX, scaleY)
+
+    this.layer.width = width * scale
+    this.layer.height = height * scale
+
+    const deltaX = this.layer.width - width
+    const deltaY = this.layer.height - height
+
+    if (this.draggingHandleIndex === 0) {
+      // top-left
+      this.layer.x = initialX - deltaX
+      this.layer.y = initialY - deltaY
+    } else if (this.draggingHandleIndex === 1) {
+      // top-right
+      this.layer.y = initialY - deltaY
+    } else if (this.draggingHandleIndex === 3) {
+      // bottom-left
+      this.layer.x = initialX - deltaX
+    }
+
+    this.updateHandles()
+  }
+
+  // public applyInverseRotation(
+  //   x: number,
+  //   y: number,
+  //   cx: number,
+  //   cy: number,
+  //   angle: number
+  // ): Point {
+  //   const radians = (angle * Math.PI) / 180
+  //   const cos = Math.cos(radians)
+  //   const sin = Math.sin(radians)
+  //   const nx = cos * (x - cx) + sin * (y - cy) + cx
+  //   const ny = cos * (y - cy) - sin * (x - cx) + cy
+  //   return { x: nx, y: ny }
+  // }
 }

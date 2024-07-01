@@ -1,7 +1,9 @@
 import Layer from './layers/Layer'
+import TextLayer from './layers/TextLayer'
 import TransformLayer from './layers/TransformLayer'
-import getClientCoordinates from './utils/getClientCoordinates'
 import clickInsideLayer from './utils/clickInsideLayer'
+import getClientCoordinates from './utils/getClientCoordinates'
+import setResizeCursor from './utils/setResizeCursor'
 
 /**
  * https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas
@@ -88,6 +90,12 @@ export class Canvas {
 
     const coords = getClientCoordinates(event, this.viewport)
 
+    const handleIndex = this.transformLayer.checkHandleHit(coords.x, coords.y)
+    if (handleIndex !== null && handleIndex !== -1) {
+      this.transformLayer.startDraggingHandle(handleIndex)
+      return
+    }
+
     this.layers.forEach((l) => (l.active = false))
 
     this.interactiveLayer = null
@@ -113,29 +121,51 @@ export class Canvas {
 
   private onMouseMove(event: MouseEvent): void {
     const coords = getClientCoordinates(event, this.viewport)
+    const handleIndex = this.transformLayer.checkHandleHit(coords.x, coords.y)
+    const isText = this.transformLayer.layer instanceof TextLayer
+
+    if (this.transformLayer.draggingHandleIndex !== null && !isText) {
+      this.transformLayer.dragHandle(coords.x, coords.y)
+      this.render()
+      return
+    }
+
+    if (handleIndex !== null && handleIndex !== -1 && !isText) {
+      const layerRotation = this.transformLayer.layer!.rotation // Asumiendo que tienes acceso a la rotación de la capa
+
+      if (handleIndex === 0 || handleIndex === 2) {
+        document.body.style.cursor = setResizeCursor(-45 + layerRotation)
+      } else if (handleIndex === 1 || handleIndex === 3) {
+        document.body.style.cursor = setResizeCursor(45 + layerRotation)
+      } else {
+        document.body.style.cursor = 'default'
+      }
+
+      return
+    }
 
     for (let i = this.layers.length - 1; i >= 0; i--) {
       const layer = this.layers[i]
       const inside = clickInsideLayer(coords.x, coords.y, layer)
 
       if (inside) {
-        this.viewport.style.cursor = 'pointer'
+        document.body.style.cursor = 'pointer'
         break
       } else {
-        this.viewport.style.cursor = 'default'
+        document.body.style.cursor = 'default'
       }
     }
 
     if (this.interactiveLayer) {
       this.interactiveLayer.x = coords.x - this.offsetX
       this.interactiveLayer.y = coords.y - this.offsetY
-      return
+      this.render()
     }
   }
 
   private onMouseUp(): void {
     document.removeEventListener('mouseup', this.onMouseUp)
-
+    this.transformLayer.stopDraggingHandle()
     this.interactiveLayer = null
   }
 }

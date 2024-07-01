@@ -17,7 +17,7 @@ const video = new VideoLayer(
 )
 video.x = 360
 video.y = 390
-video.rotation = 45
+video.rotation = 0
 video.index = 0
 video.time = 2
 

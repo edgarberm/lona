@@ -5,15 +5,10 @@ export default function applyInverseRotation(
   cy: number,
   rotation: number
 ) {
-  const angle = -rotation * (Math.PI / 180)
-  const cos = Math.cos(angle)
-  const sin = Math.sin(angle)
-
-  const dx = x - cx
-  const dy = y - cy
-
-  return {
-    x: cos * dx - sin * dy + cx,
-    y: sin * dx + cos * dy + cy,
-  }
+  const radians = (rotation * Math.PI) / 180
+  const cos = Math.cos(radians)
+  const sin = Math.sin(radians)
+  const nx = cos * (x - cx) + sin * (y - cy) + cx
+  const ny = cos * (y - cy) - sin * (x - cx) + cy
+  return { x: nx, y: ny }
 }
