@@ -111,52 +111,36 @@ export default class TransformLayer extends Layer {
   }
 
   public dragHandle(x: number, y: number): void {
-    if (
-      this.handleIndex === null ||
-      !this.layer ||
-      !this.initialLayer
-    )
-      return
+    if (this.handleIndex === null || !this.layer || !this.initialLayer) return
 
-    const {
-      width,
-      height,
-      x: initialX,
-      y: initialY,
-    } = this.initialLayer as Layer
-    const { handles } = this
+    const { width, height, x: lX, y: lY } = this.initialLayer as Layer
+    const { handles, layer } = this
     const oppositeHandle = handles[(this.handleIndex + 2) % 4]
-    const rotatedPoint = applyInverseRotation(
-      x,
-      y,
-      initialX + width / 2,
-      initialY + height / 2,
-      this.layer.rotation
-    )
-
+    const cx = lX + width / 2
+    const cy = lY + height / 2
+    const rotatedPoint = applyInverseRotation(x, y, cx, cy, layer.rotation)
     const dx = rotatedPoint.x - oppositeHandle.x
     const dy = rotatedPoint.y - oppositeHandle.y
-
     const newWidth = Math.abs(dx)
     const newHeight = Math.abs(dy)
+    const scale = Math.min(newWidth / width, newHeight / height)
 
-    const scaleX = newWidth / width
-    const scaleY = newHeight / height
-    const scale = Math.min(scaleX, scaleY)
+    layer.width = width * scale
+    layer.height = height * scale
 
-    this.layer.width = width * scale
-    this.layer.height = height * scale
-
-    const deltaX = this.layer.width - width
-    const deltaY = this.layer.height - height
+    const deltaX = layer.width - width
+    const deltaY = layer.height - height
 
     if (this.handleIndex === 0) {
-      this.layer.x = initialX - deltaX
-      this.layer.y = initialY - deltaY
+      layer.x = lX - deltaX
+      layer.y = lY - deltaY
+      return
     } else if (this.handleIndex === 1) {
-      this.layer.y = initialY - deltaY
+      layer.y = lY - deltaY
+      return
     } else if (this.handleIndex === 3) {
-      this.layer.x = initialX - deltaX
+      layer.x = lX - deltaX
+      return
     }
 
     this.updateHandles()
