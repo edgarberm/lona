@@ -1,7 +1,7 @@
 import Layer from './layers/Layer'
 import TransformLayer from './layers/TransformLayer'
 import getClientCoordinates from './utils/getClientCoordinates'
-import isClickInsideLayer from './utils/isClickInsideLayer'
+import clickInsideLayer from './utils/clickInsideLayer'
 
 /**
  * https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas
@@ -17,8 +17,8 @@ export class Canvas {
   private _fill: string
   private transformLayer: TransformLayer
   private interactiveLayer: Layer | null = null
-  private offsetX: number = 0 
-  private offsetY: number = 0 
+  private offsetX: number = 0
+  private offsetY: number = 0
 
   constructor(
     width: number,
@@ -89,19 +89,19 @@ export class Canvas {
     const coords = getClientCoordinates(event, this.viewport)
 
     this.layers.forEach((l) => (l.active = false))
-    
+
     this.interactiveLayer = null
     this.transformLayer.layer = null
     this.transformLayer.draw()
-    
+
     for (let i = this.layers.length - 1; i >= 0; i--) {
       const layer = this.layers[i]
-      const inside = isClickInsideLayer(coords.x, coords.y, layer)
-      
+      const inside = clickInsideLayer(coords.x, coords.y, layer)
+
       if (inside) {
         this.interactiveLayer = layer
         this.transformLayer.layer = layer
-        
+
         this.offsetX = coords.x - layer.x
         this.offsetY = coords.y - layer.y
 
@@ -113,6 +113,18 @@ export class Canvas {
 
   private onMouseMove(event: MouseEvent): void {
     const coords = getClientCoordinates(event, this.viewport)
+
+    for (let i = this.layers.length - 1; i >= 0; i--) {
+      const layer = this.layers[i]
+      const inside = clickInsideLayer(coords.x, coords.y, layer)
+
+      if (inside) {
+        this.viewport.style.cursor = 'pointer'
+        break
+      } else {
+        this.viewport.style.cursor = 'default'
+      }
+    }
 
     if (this.interactiveLayer) {
       this.interactiveLayer.x = coords.x - this.offsetX

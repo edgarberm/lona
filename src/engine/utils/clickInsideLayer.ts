@@ -1,7 +1,7 @@
 import Layer from '../layers/Layer'
 import applyInverseRotation from './applyInverseRotation'
 
-export default function isClickInsideLayer(
+export default function clickInsideLayer(
   clickX: number,
   clickY: number,
   layer: Layer
