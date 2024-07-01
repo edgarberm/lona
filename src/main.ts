@@ -28,17 +28,19 @@ const parent = document.querySelector('#app')!
   text.y = 100
   text.fontSize = 24
   text.fontWeight = 600
-  text.color = '#9c00ff'
+  text.color = '#D800B6'
   text.index = 1
-
+  
   canvas.addLayer(text)
-
+  
   const text2 = new TextLayer(canvas.context, 'Hello Canva')
   text2.x = 550
   text2.y = 320
-  text2.fontSize = 24
+  text2.fontSize = 60
   text2.fontWeight = 600
   text2.rotation = -45
+  text2.color = '#50FB35'
+  text2.fontFamily = 'Chalkboard'
   text2.index = 2
 
   canvas.addLayer(text2)
