@@ -6,6 +6,9 @@ export default class TransformLayer extends Layer {
   private handles: Point[] = []
   public draggingHandleIndex: number | null = null
   private initialLayerState: Partial<Layer> | null = null
+  public rotating: boolean = false
+  private initialAngle: number = 0
+  private initialMouseAngle: number = 0
 
   constructor(protected context: CanvasRenderingContext2D) {
     super(context)
@@ -157,6 +160,74 @@ export default class TransformLayer extends Layer {
       this.layer.x = initialX - deltaX
     }
 
+    this.updateHandles()
+  }
+
+  public isNearRotateHandle(x: number, y: number): boolean {
+    if (!this.layer) return false
+
+    const { x: layerX, y: layerY, width, height, rotation } = this.layer
+    const cx = layerX + width / 2
+    const cy = layerY + height / 2
+    const distance = 10
+
+    const rotatedPoint = applyInverseRotation(x, y, cx, cy, rotation)
+
+    const nearLeftEdge =
+      rotatedPoint.x >= layerX - distance && rotatedPoint.x < layerX
+    const nearRightEdge =
+      rotatedPoint.x > layerX + width &&
+      rotatedPoint.x <= layerX + width + distance
+    const nearTopEdge =
+      rotatedPoint.y >= layerY - distance && rotatedPoint.y < layerY
+    const nearBottomEdge =
+      rotatedPoint.y > layerY + height &&
+      rotatedPoint.y <= layerY + height + distance
+
+    return (
+      (nearLeftEdge || nearRightEdge || nearTopEdge || nearBottomEdge) &&
+      !this.isCursorOnHandle(rotatedPoint.x, rotatedPoint.y)
+    )
+  }
+
+  private isCursorOnHandle(x: number, y: number): boolean {
+    const size = 8
+    return this.handles.some(
+      (handle) =>
+        x >= handle.x - size / 2 &&
+        x <= handle.x + size / 2 &&
+        y >= handle.y - size / 2 &&
+        y <= handle.y + size / 2
+    )
+  }
+
+  public startRotating(x: number, y: number): void {
+    this.rotating = true
+
+    if (this.layer) {
+      const { x: layerX, y: layerY, width, height } = this.layer
+      const cx = layerX + width / 2
+      const cy = layerY + height / 2
+      this.initialAngle = this.layer.rotation
+      this.initialMouseAngle = Math.atan2(y - cy, x - cx)
+    }
+  }
+
+  public stopRotating(): void {
+    this.rotating = false
+  }
+
+  public rotate(x: number, y: number): void {
+    if (!this.rotating || !this.layer) return
+
+    const { x: layerX, y: layerY, width, height } = this.layer
+    const cx = layerX + width / 2
+    const cy = layerY + height / 2
+    const currentMouseAngle = Math.atan2(y - cy, x - cx)
+    const angleDelta = currentMouseAngle - this.initialMouseAngle
+
+    this.layer.rotation =
+      (this.initialAngle + (angleDelta * 180) / Math.PI) % 360
     this.updateHandles()
   }
 }

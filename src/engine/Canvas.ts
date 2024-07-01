@@ -4,6 +4,7 @@ import TransformLayer from './layers/TransformLayer'
 import clickInsideLayer from './utils/clickInsideLayer'
 import getClientCoordinates from './utils/getClientCoordinates'
 import setResizeCursor from './utils/setResizeCursor'
+import setRotateCursor from './utils/setRotateCursor'
 
 /**
  * https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas
@@ -96,6 +97,15 @@ export class Canvas {
       return
     }
 
+    if (
+      this.transformLayer.layer &&
+      !this.isCursorOverLayer(coords.x, coords.y) &&
+      this.transformLayer.isNearRotateHandle(coords.x, coords.y)
+    ) {
+      this.transformLayer.startRotating(coords.x, coords.y)
+      return
+    }
+
     this.layers.forEach((l) => (l.active = false))
 
     this.interactiveLayer = null
@@ -130,6 +140,12 @@ export class Canvas {
       return
     }
 
+    if (this.transformLayer.rotating) {
+      this.transformLayer.rotate(coords.x, coords.y)
+      this.render()
+      return
+    }
+
     if (handleIndex !== null && handleIndex !== -1 && !isText) {
       const layerRotation = this.transformLayer.layer!.rotation
 
@@ -142,6 +158,20 @@ export class Canvas {
       }
 
       return
+    }
+
+    if (
+      this.transformLayer.layer &&
+      !this.isCursorOverLayer(coords.x, coords.y)
+    ) {
+      const isNearRotateHandle = this.transformLayer.isNearRotateHandle(
+        coords.x,
+        coords.y
+      )
+      if (isNearRotateHandle) {
+        document.body.style.cursor = setRotateCursor()
+        return
+      }
     }
 
     for (let i = this.layers.length - 1; i >= 0; i--) {
@@ -166,6 +196,16 @@ export class Canvas {
   private onMouseUp(): void {
     document.removeEventListener('mouseup', this.onMouseUp)
     this.transformLayer.stopDraggingHandle()
+    this.transformLayer.stopRotating()
     this.interactiveLayer = null
+  }
+
+  private isCursorOverLayer(x: number, y: number): boolean {
+    for (const layer of this.layers) {
+      if (clickInsideLayer(x, y, layer)) {
+        return true
+      }
+    }
+    return false
   }
 }
