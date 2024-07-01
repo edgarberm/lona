@@ -153,24 +153,21 @@ export default class TransformLayer extends Layer {
     const cx = layerX + width / 2
     const cy = layerY + height / 2
     const distance = 10
-
     const rotatedPoint = applyInverseRotation(x, y, cx, cy, rotation)
 
-    const nearLeftEdge =
-      rotatedPoint.x >= layerX - distance && rotatedPoint.x < layerX
-    const nearRightEdge =
-      rotatedPoint.x > layerX + width &&
-      rotatedPoint.x <= layerX + width + distance
-    const nearTopEdge =
-      rotatedPoint.y >= layerY - distance && rotatedPoint.y < layerY
-    const nearBottomEdge =
-      rotatedPoint.y > layerY + height &&
-      rotatedPoint.y <= layerY + height + distance
+    const isNearEdge = (p: number, e: number, s: number) => Math.abs(p - e) <= s
 
-    return (
-      (nearLeftEdge || nearRightEdge || nearTopEdge || nearBottomEdge) &&
-      !this.isCursorOnHandle(rotatedPoint.x, rotatedPoint.y)
+    const nearLeft = isNearEdge(rotatedPoint.x, layerX, distance)
+    const nearRight = isNearEdge(rotatedPoint.x, layerX + width, distance)
+    const nearTop = isNearEdge(rotatedPoint.y, layerY, distance)
+    const nearBottom = isNearEdge(rotatedPoint.y, layerY + height, distance)
+
+    const isCursorOnHandle = this.isCursorOnHandle(
+      rotatedPoint.x,
+      rotatedPoint.y
     )
+
+    return (nearLeft || nearRight || nearTop || nearBottom) && !isCursorOnHandle
   }
 
   private isCursorOnHandle(x: number, y: number): boolean {
