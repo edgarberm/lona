@@ -24,7 +24,7 @@ export default class TransformLayer extends Layer {
     this.context.rotate((rotation * Math.PI) / 180.0)
     this.context.translate(-cx, -cy)
 
-    this.context.strokeStyle = '#0080ff'
+    this.context.strokeStyle = '#1380e4'
     this.context.lineWidth = 1
     this.context.fillStyle = 'white'
     
