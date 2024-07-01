@@ -18,6 +18,7 @@ const parent = document.querySelector('#app')!
   video.x = 360
   video.y = 390
   video.rotation = 30
+  video.index = 0
 
   canvas.addLayer(video)
 
@@ -28,6 +29,7 @@ const parent = document.querySelector('#app')!
   text.fontSize = 24
   text.fontWeight = 600
   text.color = '#9c00ff'
+  text.index = 1
 
   canvas.addLayer(text)
 
@@ -37,6 +39,7 @@ const parent = document.querySelector('#app')!
   text2.fontSize = 24
   text2.fontWeight = 600
   text2.rotation = -45
+  text2.index = 2
 
   canvas.addLayer(text2)
 
@@ -48,6 +51,7 @@ const parent = document.querySelector('#app')!
   image.x = 0
   image.y = 0
   image.rotation = 45
+  image.index = 3
 
   canvas.addLayer(image)
 

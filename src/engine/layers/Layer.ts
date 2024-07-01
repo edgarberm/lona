@@ -8,6 +8,7 @@ export default abstract class Layer {
   private _height: number = 0
   private _active: boolean = false
   private _rotation: number = 0
+  private _index: number = 0
 
   constructor(protected context: CanvasRenderingContext2D) {}
 
@@ -65,6 +66,14 @@ export default abstract class Layer {
 
   set rotation(rotation: number) {
     this._rotation = rotation
+  }
+  
+  get index(): number {
+    return this._index
+  }
+
+  set index(index: number) {
+    this._index = index
   }
 
   public abstract draw(): void

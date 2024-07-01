@@ -62,7 +62,9 @@ export class Canvas {
   }
 
   public addLayer(layer: Layer): void {
-    this.layers = [...this.layers, layer]
+    this.layers = [...this.layers, layer].sort(
+      (a: Layer, b: Layer) => a.index - b.index
+    )
   }
 
   public removeLayer(layer: Layer): void {
