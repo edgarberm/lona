@@ -22,12 +22,13 @@ export default class TextLayer extends Layer {
     this.width = this.context.measureText(this.text).width
     this.height = this.fontSize
     
-    const centerX = this.x + this.width / 2
-    const centerY = this.y + this.fontSize / 2
+    const cx = this.x + this.width / 2
+    const cy = this.y + this.fontSize / 2
 
-    this.context.translate(centerX, centerY)
+    this.context.translate(cx, cy)
     this.context.rotate((this.rotation * Math.PI) / 180.0)
-    this.context.translate(-centerX, -centerY)
+    this.context.translate(-cx, -cy)
+
     this.context.fillText(this.text, this.x, this.y + this.fontSize)
 
     this.context.restore()

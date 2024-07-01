@@ -8,7 +8,7 @@ const parent = document.querySelector('#app')!
 
 // function init() {
   // Init canvas
-  const canvas = new Canvas(1024, 768, parent, 'white')
+  const canvas = new Canvas(1024, 768, parent, '#fff') // 202124
 
   // Create video layer
   const video = new VideoLayer(
@@ -17,6 +17,7 @@ const parent = document.querySelector('#app')!
   )
   video.x = 360
   video.y = 390
+  video.rotation = 30
 
   canvas.addLayer(video)
 
@@ -53,15 +54,15 @@ const parent = document.querySelector('#app')!
   // Render the canvas
   canvas.render()
 
-  // function render() {
-  //   text.rotation += 2
+  function render() {
+    // text.rotation += 2
 
-  //   canvas.render()
-  //   window.requestAnimationFrame(render)
-  // }
+    canvas.render()
+    window.requestAnimationFrame(render)
+  }
 
-  // window.requestAnimationFrame(render)
-// }
+  window.requestAnimationFrame(render)
+
 
 // const button = document.createElement('button')
 // button.innerText = 'INIT'

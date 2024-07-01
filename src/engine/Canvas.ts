@@ -1,14 +1,21 @@
 import Layer from './layers/Layer'
+import TransformLayer from './layers/TransformLayer'
 import getClientCoordinates from './utils/getClientCoordinates'
 import isClickInsideLayer from './utils/isClickInsideLayer'
 
+/**
+ * https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas
+ */
 export class Canvas {
+  public version: number = 0.1
   public viewport: HTMLCanvasElement
   public context: CanvasRenderingContext2D
   public layers: Layer[] = []
+  public dpr: number = 1
   private _width: number
   private _height: number
   private _fill: string
+  private transformLayer: TransformLayer
 
   constructor(
     width: number,
@@ -21,19 +28,21 @@ export class Canvas {
     this._fill = fill
 
     const parent = element ?? document.body
-    const dpr = window.devicePixelRatio ?? 1
+    this.dpr = window.devicePixelRatio ?? 1
 
     this.viewport = document.createElement('canvas')
     this.viewport.id = 'canvas'
-    this.viewport.width = width * dpr
-    this.viewport.height = height * dpr
+    this.viewport.width = width * this.dpr
+    this.viewport.height = height * this.dpr
     this.viewport.style.width = `${width}px`
     this.viewport.style.height = `${height}px`
 
     parent.appendChild(this.viewport)
 
     this.context = this.viewport.getContext('2d')!
-    this.context.scale(dpr, dpr)
+    this.context.scale(this.dpr, this.dpr)
+
+    this.transformLayer = new TransformLayer(this.context)
 
     this.viewport.addEventListener('mousedown', this.onMouseDown.bind(this))
   }
@@ -46,6 +55,8 @@ export class Canvas {
     for (const layer of this.layers) {
       layer.draw()
     }
+
+    this.transformLayer.draw()
 
     callback?.(this.context)
   }
@@ -67,16 +78,20 @@ export class Canvas {
   }
 
   onMouseDown(event: MouseEvent): void {
-    
     const coords = getClientCoordinates(event, this.viewport)
-    
+
     this.layers.forEach((l) => (l.active = false))
+
+    this.transformLayer.layer = null
+    this.transformLayer.draw()
 
     for (const layer of this.layers) {
       const inside = isClickInsideLayer(coords.x, coords.y, layer)
 
       if (inside) {
-        console.log(layer)
+        // console.log(layer)
+        this.transformLayer.layer = layer
+        this.transformLayer.draw()
         break
       }
     }

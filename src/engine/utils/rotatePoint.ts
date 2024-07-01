@@ -5,11 +5,11 @@ export default function rotatePoint(
   y: number,
   angle: number
 ): { x: number; y: number } {
-  const radians = (Math.PI / 180) * angle
+  const radians = (Math.PI / 180) * -angle
   const cos = Math.cos(radians)
   const sin = Math.sin(radians)
-  const nx = cos * (x - cx) + sin * (y - cy) + cx
-  const ny = cos * (y - cy) - sin * (x - cx) + cy
+  const nx = cos * (x - cx) - sin * (y - cy) + cx
+  const ny = sin * (x - cx) + cos * (y - cy) + cy
 
   return { x: nx, y: ny }
 }

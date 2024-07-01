@@ -15,12 +15,12 @@ export default class VideoLayer extends Layer {
 
     this.context.save()
 
-    const centerX = this.x + this.width / 2
-    const centerY = this.y + this.height / 2
+    const cx = this.x + this.width / 2
+    const cy = this.y + this.height / 2
 
-    this.context.translate(centerX, centerY)
+    this.context.translate(cx, cy)
     this.context.rotate((this.rotation * Math.PI) / 180.0)
-    this.context.translate(-centerX, -centerY)
+    this.context.translate(-cx, -cy)
     this.context.drawImage(this._video, this.x, this.y, this.width, this.height)
 
     this.context.restore()
