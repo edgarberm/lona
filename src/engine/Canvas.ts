@@ -4,6 +4,34 @@ import TransformLayer from './layers/TransformLayer'
 
 /**
  * https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas
+ * 
+ * State
+ * https://usehooks.com/usehistorystate
+ * https://www.npmjs.com/package/@uidotdev/usehooks?activeTab=code
+ *
+ * Transforms
+ * https://stackoverflow.com/questions/60241598/how-do-i-rotate-a-html-canvas-shape-by-only-using-a-transform
+ * https://medium.com/@programer7823/zoom-rotate-move-and-drag-layers-images-text-or-shapes-in-html-canvas-7907a21d9139
+ *
+ * Transcription
+ * https://www.outcome.co.kr/blog/local-audio-files-using-node-js-to-transcribe
+ * https://stackoverflow.com/questions/74783159/how-to-convert-audio-mp3-file-to-text-in-javascript
+ * https://dev.to/ajones_codes/how-to-get-audio-transcriptions-from-whisper-without-a-file-system-21ek
+ *
+ * FX
+ * https://stackoverflow.com/questions/39014363/fade-canvas-video-from-greyscale-to-color/39026987#39026987
+ *
+ * https://stackoverflow.com/questions/50681683/how-to-save-canvas-animation-as-gif-or-webm
+ *
+ * https://dev.to/melissamcewen/code-experiment-converting-canvas-animations-to-gifs-58hh
+ *
+ * https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Manipulating_video_using_canvas
+ *
+ * https://webrtc.github.io/samples/src/content/capture/canvas-record/
+ * https://github.com/webrtc/samples/blob/gh-pages/src/content/capture/canvas-record/js/main.js
+ *
+ * https://github.com/strapi/nextjs-corporate-starter
+ * https://strapi.io/blog/build-a-blog-with-next-react-js-strapi
  */
 export class Canvas {
   public version: number = 0.1

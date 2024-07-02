@@ -4,7 +4,7 @@ import TextLayer from './engine/layers/TextLayer'
 import VideoLayer from './engine/layers/VideoLayer'
 import './style.css'
 
-const parent = document.querySelector('#app')!
+const parent = document.querySelector('#lona')!
 
 // function init() {
 // Init canvas
@@ -61,7 +61,8 @@ canvas.addLayer(image)
 // Render the canvas
 // canvas.render()
 function render() {
-  // text.rotation += 2
+  // text.x += 2 
+  // text.y += 2 
 
   canvas.render()
   window.requestAnimationFrame(render)
@@ -76,3 +77,10 @@ window.requestAnimationFrame(render)
 // button.addEventListener('click', () => {
 //   init()
 // })
+
+const txtInput = document.querySelector('#text-input')!
+console.log(txtInput);
+
+txtInput.addEventListener('input', (event: Event) => {
+  text.text = (event.target as HTMLInputElement).value
+})

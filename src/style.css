@@ -21,6 +21,10 @@ body {
 }
 
 #app {
+  width: 100%;
+}
+
+#lona {
   display: flex;
   justify-content: center;
   width: 100%;
