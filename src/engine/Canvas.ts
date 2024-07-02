@@ -1,10 +1,6 @@
+import { handleCanvasMouseDown, handleCanvasMouseMove, handleCanvasMouseUp } from './events'
 import Layer from './layers/Layer'
-import TextLayer from './layers/TextLayer'
 import TransformLayer from './layers/TransformLayer'
-import clickInsideLayer from './utils/clickInsideLayer'
-import getClientCoordinates from './utils/getClientCoordinates'
-import setResizeCursor from './utils/setResizeCursor'
-import setRotateCursor from './utils/setRotateCursor'
 
 /**
  * https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas
@@ -15,13 +11,13 @@ export class Canvas {
   public context: CanvasRenderingContext2D
   public layers: Layer[] = []
   public dpr: number = 1
+  public transformLayer: TransformLayer
+  public interactiveLayer: Layer | null = null
+  public offsetX: number = 0
+  public offsetY: number = 0
   private _width: number
   private _height: number
   private _fill: string
-  private transformLayer: TransformLayer
-  private interactiveLayer: Layer | null = null
-  private offsetX: number = 0
-  private offsetY: number = 0
 
   constructor(
     width: number,
@@ -87,115 +83,14 @@ export class Canvas {
   }
 
   private onMouseDown(event: MouseEvent): void {
-    document.addEventListener('mouseup', this.onMouseUp.bind(this))
-
-    const coords = getClientCoordinates(event, this.viewport)
-    const transformLayer = this.transformLayer
-
-    const handleIndex = transformLayer.checkHandleHit(coords.x, coords.y)
-    if (handleIndex !== null && handleIndex !== -1) {
-      transformLayer.startDraggingHandle(handleIndex)
-      return
-    }
-
-    if (
-      transformLayer.layer &&
-      transformLayer.isNearHandle(coords.x, coords.y)
-    ) {
-      transformLayer.startRotating(coords.x, coords.y)
-      return
-    }
-
-    this.layers.forEach((l) => (l.active = false))
-
-    this.interactiveLayer = null
-    transformLayer.layer = null
-    transformLayer.draw()
-
-    for (let i = this.layers.length - 1; i >= 0; i--) {
-      const layer = this.layers[i]
-      const inside = clickInsideLayer(coords.x, coords.y, layer)
-
-      if (inside) {
-        this.interactiveLayer = layer
-        transformLayer.layer = layer
-
-        this.offsetX = coords.x - layer.x
-        this.offsetY = coords.y - layer.y
-
-        transformLayer.draw()
-        break
-      }
-    }
+    handleCanvasMouseDown(event, this)
   }
 
   private onMouseMove(event: MouseEvent): void {
-    const coords = getClientCoordinates(event, this.viewport)
-    const transformLayer = this.transformLayer
-    const handleIndex =transformLayer.checkHandleHit(coords.x, coords.y)
-    const isText = transformLayer.layer instanceof TextLayer
-
-    if (transformLayer.handleIndex !== null && !isText) {
-      transformLayer.dragHandle(coords.x, coords.y)
-      this.render()
-      return
-    }
-
-    if (transformLayer.rotating) {
-      transformLayer.rotate(coords.x, coords.y)
-      this.render()
-      return
-    }
-
-    if (handleIndex !== null && handleIndex !== -1 && !isText) {
-      const layerRotation = transformLayer.layer!.rotation
-
-      if (handleIndex === 0 || handleIndex === 2) {
-        document.body.style.cursor = setResizeCursor(-45 + layerRotation)
-      } else if (handleIndex === 1 || handleIndex === 3) {
-        document.body.style.cursor = setResizeCursor(45 + layerRotation)
-      } else {
-        document.body.style.cursor = 'default'
-      }
-
-      return
-    }
-
-    if (transformLayer.layer) {
-      const isNearRotateHandle = transformLayer.isNearHandle(
-        coords.x,
-        coords.y
-      )
-      if (isNearRotateHandle) {
-        console.log('llega');
-        document.body.style.cursor = setRotateCursor()
-        return
-      }
-    }
-    
-    for (let i = this.layers.length - 1; i >= 0; i--) {
-      const layer = this.layers[i]
-      const inside = clickInsideLayer(coords.x, coords.y, layer)
-
-      if (inside) {
-        document.body.style.cursor = 'pointer'
-        break
-      } else {
-        document.body.style.cursor = 'default'
-      }
-    }
-
-    if (this.interactiveLayer) {
-      this.interactiveLayer.x = coords.x - this.offsetX
-      this.interactiveLayer.y = coords.y - this.offsetY
-      this.render()
-    }
+    handleCanvasMouseMove(event, this)
   }
 
-  private onMouseUp(): void {
-    document.removeEventListener('mouseup', this.onMouseUp)
-    this.transformLayer.stopDraggingHandle()
-    this.transformLayer.stopRotating()
-    this.interactiveLayer = null
+  public onMouseUp(event: MouseEvent): void {
+    handleCanvasMouseUp(event, this)
   }
 }
