@@ -64,12 +64,12 @@ export function handleCanvasMouseMove(event: MouseEvent, canvas: Canvas): void {
   }
 
   if (handleIndex !== null && handleIndex !== -1 && !isText) {
-    const layerRotation = transformLayer.layer!.rotation
+    const rotation = transformLayer.layer!.rotation
 
     if (handleIndex === 0 || handleIndex === 2) {
-      document.body.style.cursor = setResizeCursor(-45 + layerRotation)
+      document.body.style.cursor = setResizeCursor(-45 + rotation)
     } else if (handleIndex === 1 || handleIndex === 3) {
-      document.body.style.cursor = setResizeCursor(45 + layerRotation)
+      document.body.style.cursor = setResizeCursor(45 + rotation)
     } else {
       document.body.style.cursor = 'default'
     }
@@ -78,8 +78,10 @@ export function handleCanvasMouseMove(event: MouseEvent, canvas: Canvas): void {
   }
 
   if (transformLayer.layer) {
+    const inside = clickInsideLayer(coords.x, coords.y, transformLayer.layer)
     const isNearRotateHandle = transformLayer.isNearHandle(coords.x, coords.y)
-    if (isNearRotateHandle) {
+    
+    if (isNearRotateHandle && !inside) {
       document.body.style.cursor = setRotateCursor()
       return
     }

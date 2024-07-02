@@ -1,3 +1,4 @@
+import { normalizeAngle, snapToKeyAngle } from '../utils/angle'
 import applyInverseRotation from '../utils/applyInverseRotation'
 import Layer from './Layer'
 
@@ -205,9 +206,11 @@ export default class TransformLayer extends Layer {
     const cy = layerY + height / 2
     const currentMouseAngle = Math.atan2(y - cy, x - cx)
     const angleDelta = currentMouseAngle - this.initialMouseAngle
+    const newAngle = this.initialAngle + (angleDelta * 180) / Math.PI
+    const normalizedAngle = normalizeAngle(newAngle)
+    const snappedAngle = snapToKeyAngle(normalizedAngle)
 
-    this.layer.rotation =
-      (this.initialAngle + (angleDelta * 180) / Math.PI) % 360
+    this.layer.rotation = snappedAngle
 
     this.updateHandles()
   }
