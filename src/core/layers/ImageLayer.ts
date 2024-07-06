@@ -1,20 +1,23 @@
 import Layer from './Layer'
 
 export default class ImageLayer extends Layer {
+  public type: string = 'image'
   private _url: string = ''
   private _image?: HTMLImageElement = undefined
 
-  constructor(protected context: CanvasRenderingContext2D, url: string) {
+  constructor(
+    protected context: CanvasRenderingContext2D,
+    url: string,
+  ) {
     super(context)
 
     this.url = url ?? ''
   }
 
-  public draw(): void {
-    if (!this._image) return
+  public render(): void {
+    if (!this.loaded || !this._image) return
 
     this.context.save()
-    
     const cx = this.x + this.width / 2
     const cy = this.y + this.height / 2
 
@@ -34,6 +37,7 @@ export default class ImageLayer extends Layer {
   set url(url: string) {
     this._url = url
 
+    this.loaded = false
     this.load(url)
   }
 
@@ -43,10 +47,8 @@ export default class ImageLayer extends Layer {
 
     image.addEventListener('load', () => {
       this._image = image
-      this.width = image.width
-      this.height = image.height
-
-      this.draw()
+      this.loaded = true
+      // this.draw()
     })
   }
 }

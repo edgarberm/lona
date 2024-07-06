@@ -1,5 +1,4 @@
-import { normalizeAngle, snapToKeyAngle } from '../utils/angle'
-import applyInverseRotation from '../utils/applyInverseRotation'
+import { applyInverseRotation, normalizeAngle, snapToKeyAngle } from '../utils'
 import Layer from './Layer'
 
 const size = 8
@@ -12,9 +11,12 @@ export default class TransformLayer extends Layer {
   public rotating: boolean = false
   private initialAngle: number = 0
   private initialMouseAngle: number = 0
+  private camera: Camera
 
-  constructor(protected context: CanvasRenderingContext2D) {
+  constructor(protected context: CanvasRenderingContext2D, camera: Camera) {
     super(context)
+
+    this.camera = camera
   }
 
   get layer(): Layer | null {
@@ -25,7 +27,8 @@ export default class TransformLayer extends Layer {
     this._layer = layer
   }
 
-  public draw(): void {
+
+  public render(): void {
     if (!this.layer) return
 
     const { x, y, width, height, rotation } = this.layer
@@ -41,23 +44,23 @@ export default class TransformLayer extends Layer {
     this.context.translate(-cx, -cy)
 
     this.context.strokeStyle = '#1380e4'
-    this.context.lineWidth = 1
+    this.context.lineWidth = 1 / this.camera.z
     this.context.fillStyle = 'white'
 
     this.context.strokeRect(x, y, width, height)
 
     this.handles.forEach((handle) => {
       this.context.fillRect(
-        handle.x - size / 2,
-        handle.y - size / 2,
-        size,
-        size
+        handle.x - size / (2 * this.camera.z),
+        handle.y - size / (2 * this.camera.z),
+        size / this.camera.z,
+        size / this.camera.z
       )
       this.context.strokeRect(
-        handle.x - size / 2,
-        handle.y - size / 2,
-        size,
-        size
+        handle.x - size / (2 * this.camera.z),
+        handle.y - size / (2 * this.camera.z),
+        size / this.camera.z,
+        size / this.camera.z
       )
     })
 
@@ -86,10 +89,10 @@ export default class TransformLayer extends Layer {
 
     return this.handles.findIndex(
       (handle) =>
-        rotatedPoint.x >= handle.x - size / 2 &&
-        rotatedPoint.x <= handle.x + size / 2 &&
-        rotatedPoint.y >= handle.y - size / 2 &&
-        rotatedPoint.y <= handle.y + size / 2
+        rotatedPoint.x >= handle.x - size / (2 * this.camera.z) &&
+        rotatedPoint.x <= handle.x + size / (2 * this.camera.z) &&
+        rotatedPoint.y >= handle.y - size / (2 * this.camera.z) &&
+        rotatedPoint.y <= handle.y + size / (2 * this.camera.z)
     )
   }
 
@@ -153,7 +156,7 @@ export default class TransformLayer extends Layer {
     const { x: layerX, y: layerY, width, height, rotation } = this.layer
     const cx = layerX + width / 2
     const cy = layerY + height / 2
-    const distance = 10
+    const distance = 10 / this.camera.z
     const rotatedPoint = applyInverseRotation(x, y, cx, cy, rotation)
 
     const isNearEdge = (p: number, e: number, s: number) => Math.abs(p - e) <= s
@@ -174,10 +177,10 @@ export default class TransformLayer extends Layer {
   private isCursorOnHandle(x: number, y: number): boolean {
     return this.handles.some(
       (handle) =>
-        x >= handle.x - size / 2 &&
-        x <= handle.x + size / 2 &&
-        y >= handle.y - size / 2 &&
-        y <= handle.y + size / 2
+        x >= handle.x - size / (2 * this.camera.z) &&
+        x <= handle.x + size / (2 * this.camera.z) &&
+        y >= handle.y - size / (2 * this.camera.z) &&
+        y <= handle.y + size / (2 * this.camera.z)
     )
   }
 

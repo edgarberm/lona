@@ -1,20 +1,27 @@
 import Layer from './Layer'
 
 export default class VideoLayer extends Layer {
+  public type: string = 'video'
   private _url: string = ''
   private _video?: HTMLVideoElement = undefined
   private _currentTime: number = 0.01
+  private _playing: boolean = false
 
-  constructor(protected context: CanvasRenderingContext2D, url: string) {
+  constructor(
+    protected context: CanvasRenderingContext2D,
+    url: string
+  ) {
     super(context)
 
     this.url = url ?? ''
   }
 
-  public draw(): void {
-    if (!this._video) return
-    
-    this._video.currentTime = this._currentTime
+  public render(): void {
+    if (!this.loaded || !this._video) return
+
+    if (!this._playing) {
+      this._video.currentTime = this._currentTime
+    }
 
     this.context.save()
 
@@ -29,6 +36,17 @@ export default class VideoLayer extends Layer {
     this.context.restore()
   }
 
+  public play(): void {
+    this._playing = true
+    this._video?.play()
+  }
+
+  public pause(): void {
+    this._playing = false
+    this._video?.pause()
+  }
+
+
   get url() {
     return this._url
   }
@@ -39,11 +57,11 @@ export default class VideoLayer extends Layer {
     this.load(url)
   }
 
-  get time() {
+  get currentTime() {
     return this._currentTime
   }
 
-  set time(time: number) {
+  set currentTime(time: number) {
     this._currentTime = time
   }
 
@@ -52,17 +70,21 @@ export default class VideoLayer extends Layer {
     video.setAttribute('crossorigin', 'anonymous')
     video.setAttribute('preload', 'metadata')
     video.src = url
+    video.preload = 'metadata'
+    // video.autoplay = true
+    video.loop = true
     video.currentTime = this._currentTime
     video.load()
-    
+
+    this._video = video
+
     video.addEventListener('loadedmetadata', () => {
-      this._video = video
-      this.width = video.videoWidth / 2
-      this.height = video.videoHeight / 2
+      this.loaded = true
     })
-    
-    video.addEventListener('loadeddata', () => {
-      this.draw()
-    })
+
+    // video.addEventListener('loadeddata', () => {
+    //   console.log(video.duration);
+    //   this.draw()
+    // })
   }
 }
